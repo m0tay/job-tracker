@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title th:text="${editing} ? 'Edit Application' : 'New Application'">Application Form</title></head>
+<body>
+<section class="main">
+    <h1 th:if="${editing}"><i class="fa-solid fa-pencil"></i> Edit Application</h1>
+    <h1 th:unless="${editing}"><i class="fa-solid fa-plus"></i> New Application</h1>
+    <p class="subtitle-text" th:text="${editing} ? 'Update the application details.' : 'Add a new company to your pipeline.'"></p>
+
+    <div class="card">
+        <form th:action="${editing} ? @{'/applications/' + ${app.id} + '/edit'} : @{/applications/new}"
+              method="post">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Company *</label>
+                    <input type="text" name="company" th:value="${app.company}" required placeholder="e.g. Altice Labs">
+                </div>
+                <div class="form-group">
+                    <label>Position</label>
+                    <input type="text" name="position" th:value="${app.position}" placeholder="e.g. Backend Developer">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="Aguardam Resposta" th:selected="${app.status == 'Aguardam Resposta'}">Aguardam Resposta</option>
+                        <option value="Em Avaliação" th:selected="${app.status == 'Em Avaliação'}">Em Avaliação</option>
+                        <option value="Rejeitado" th:selected="${app.status == 'Rejeitado'}">Rejeitado</option>
+                        <option value="Ghosting" th:selected="${app.status == 'Ghosting'}">Ghosting</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Company Folder (in companies/)</label>
+                    <input type="text" name="companyFolder" th:value="${app.companyFolder}" placeholder="e.g. AlticeLabs">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Details / Notes</label>
+                <textarea name="details" rows="3" th:text="${app.details}" placeholder="e.g. CV submitted via LinkedIn..."></textarea>
+            </div>
+
+            <div class="form-row" th:unless="${editing}">
+                <div class="form-group">
+                    <label>Application Date</label>
+                    <input type="date" name="applicationDate" th:value="${app.applicationDate != null ? app.applicationDate : #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                </div>
+            </div>
+
+            <button th:if="${editing}" type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+            <button th:unless="${editing}" type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Application</button>
+        </form>
+
+        <div th:if="${editing}" style="margin-top:30px; padding-top:20px; border-top:1px solid #eee;">
+            <h2><i class="fa-solid fa-trash"></i> Delete Application</h2>
+            <p style="color:#e74c3c; margin-bottom:10px;">This will permanently delete this application and all its interactions.</p>
+            <form th:action="@{'/applications/' + ${app.id} + '/delete'}" method="post">
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Are you sure? This action is irreversible.')">
+                    <i class="fa-solid fa-trash"></i> Delete Permanently
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

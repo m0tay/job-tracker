@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title>Update Recruiter Response</title></head>
+<body>
+<section class="main">
+    <h1><i class="fa-solid fa-pencil"></i> Update Recruiter Response</h1>
+    <p class="subtitle-text">
+        Update the response status for
+        <strong th:text="${recruiter.name}"></strong>
+        (<span th:text="${recruiter.company}"></span>).
+    </p>
+
+    <div class="card">
+        <form th:action="@{'/recruiters/' + ${recruiter.id} + '/update-response'}" method="post">
+
+            <div class="form-group">
+                <label>Response</label>
+                <select name="response">
+                    <option value="Pendente" th:selected="${recruiter.response == 'Pendente'}">Pendente</option>
+                    <option value="Positivo" th:selected="${recruiter.response == 'Positivo'}">Positivo</option>
+                    <option value="Negativo" th:selected="${recruiter.response == 'Negativo'}">Negativo</option>
+                    <option value="Ghost" th:selected="${recruiter.response == 'Ghost'}">Ghost</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea name="notes" rows="3" th:text="${recruiter.notes}" placeholder="Any update notes..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Update Response</button>
+        </form>
+
+        <div style="margin-top:30px; padding-top:20px; border-top:1px solid #eee;">
+            <h2><i class="fa-solid fa-trash"></i> Delete Recruiter</h2>
+            <p style="color:#e74c3c; margin-bottom:10px;">This will permanently delete this recruiter record and all associated interactions.</p>
+            <form th:action="@{'/recruiters/' + ${recruiter.id} + '/delete'}" method="post">
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Are you sure? This action is irreversible.')">
+                    <i class="fa-solid fa-trash"></i> Delete Permanently
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

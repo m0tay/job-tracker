@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title>Dashboard</title></head>
+<body>
+<section class="main">
+    <h1><i class="fa-solid fa-chart-pie"></i> Dashboard</h1>
+    <p class="subtitle-text">Pipeline overview and key metrics.</p>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="metrics">
+        <div class="metric">
+            <div class="value" th:text="${metrics['total']}">0</div>
+            <div class="label">Total</div>
+        </div>
+        <div class="metric good">
+            <div class="value" th:text="${metrics['interviews']}">0</div>
+            <div class="label">Interviews</div>
+        </div>
+        <div class="metric">
+            <div class="value" th:text="${metrics['waiting']}">0</div>
+            <div class="label">Waiting</div>
+        </div>
+        <div class="metric warn">
+            <div class="value" th:text="${metrics['recontact']}">0</div>
+            <div class="label">Need Recontact</div>
+        </div>
+        <div class="metric">
+            <div class="value" th:text="${metrics['closed']}">0</div>
+            <div class="label">Closed</div>
+        </div>
+    </div>
+
+    <div th:if="${metrics['recontact'] > 0}" class="alert alert-error">
+        <i class="fa-solid fa-triangle-exclamation"></i> You have <strong th:text="${metrics['recontact']}"></strong> companies with no response for 7+ days.
+        <a href="/follow-up">Go to Follow-up Generator →</a>
+    </div>
+    <div th:if="${metrics['recontact'] == 0}" class="alert alert-success">
+        <i class="fa-solid fa-check"></i> All under control. No company needs urgent follow-up.
+    </div>
+
+    <hr class="divider">
+
+    <div class="card">
+        <h2>Pipeline</h2>
+        <form method="get" action="/" style="margin-bottom:15px;">
+            <div class="form-row">
+                <div class="form-group" style="max-width:250px;">
+                    <label>Filter by Status:</label>
+                    <select name="statusFilter" onchange="this.form.submit()">
+                        <option value="All">All</option>
+                        <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                                th:selected="${s == statusFilter}"></option>
+                    </select>
+                </div>
+            </div>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th>Days w/o Reply</th>
+                    <th>Last Contact</th>
+                    <th># Contacts</th>
+                    <th>Details</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="row : ${rows}"
+                    th:classappend="${row['actionRaw'] == 'Recontact'} ? 'recontact' : (${row['actionRaw'] == 'Hot'} ? 'hot' : '')">
+                    <td><strong th:text="${row['company']}"></strong></td>
+                    <td th:text="${row['position']}"></td>
+                    <td th:text="${row['status']}"></td>
+                    <td th:text="${row['action']}"></td>
+                    <td th:text="${row['daysSinceContact']}"></td>
+                    <td th:text="${row['lastContact']}"></td>
+                    <td th:text="${row['contactCount']}"></td>
+                    <td th:text="${#strings.abbreviate(row['details'], 40)}"></td>
+                    <td>
+                        <a th:href="@{'/applications/' + ${row['id']} + '/edit'}" class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;">Edit</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title>Follow-up Generator</title></head>
+<body>
+<section class="main">
+    <h1><i class="fa-solid fa-envelope-open-text"></i> Follow-up Email Generator</h1>
+    <p class="subtitle-text">Auto-generated follow-up emails for companies with no response for 7+ days.</p>
+
+    <div th:if="${#lists.isEmpty(entries)}" class="alert alert-success">
+        <i class="fa-solid fa-champagne-glasses"></i> No company needs follow-up! All applications are within the 7-day window.
+    </div>
+
+    <div th:unless="${#lists.isEmpty(entries)}" class="alert alert-error">
+        <i class="fa-solid fa-triangle-exclamation"></i> You have <strong th:text="${#lists.size(entries)}"></strong> companies that need follow-up.
+    </div>
+
+    <div th:each="e : ${entries}" class="card">
+        <h2>
+            <i class="fa-solid fa-bell"></i> <span th:text="${e['app'].company}"></span>
+            — <span th:text="${e['app'].position}"></span>
+            <span style="color:#888; font-size:0.85rem;">
+                (<span th:text="${e['daysSinceContact']}"></span> days without response)
+            </span>
+        </h2>
+
+        <div class="tabs" style="margin-top:15px;">
+            <span class="tab active" th:id="'tab-pt-' + ${e['app'].id}"
+                  th:onclick="'showTab(' + ${e['app'].id} + ', \'pt\')'">PT — Português</span>
+            <span class="tab" th:id="'tab-en-' + ${e['app'].id}"
+                  th:onclick="'showTab(' + ${e['app'].id} + ', \'en\')'">EN — English</span>
+        </div>
+
+        <div th:id="'email-pt-' + ${e['app'].id}" class="code-block">Assunto: Pedido de Feedback — <span th:text="${e['app'].position}"></span> — Douglas Lobo
+
+Olá Equipa de Recrutamento,
+
+Espero que estejam bem! Escrevo para dar seguimento à minha candidatura para a posição de <span th:text="${e['app'].position}"></span>, submetida a <span th:text="${e['dateFmt']}"></span>.
+
+Continuo muito entusiasmado com esta oportunidade e gostaria de saber se têm alguma atualização sobre o estado do meu processo. Fico inteiramente disponível para fornecer qualquer informação adicional ou para agendar uma entrevista na vossa conveniência.
+
+Agradeço desde já a vossa atenção.
+
+Com os melhores cumprimentos,
+Douglas Lobo
++351 967 704 277
+linkedin.com/in/douglascnlobo/</div>
+
+        <div th:id="'email-en-' + ${e['app'].id}" class="code-block" style="display:none;">Subject: Application Follow-up — <span th:text="${e['app'].position}"></span> — Douglas Lobo
+
+Hi Recruitment Team,
+
+I hope this message finds you well. I am writing to follow up on my application for the <span th:text="${e['app'].position}"></span> position, which I submitted on <span th:text="${e['dateFmt']}"></span>.
+
+I remain very enthusiastic about this opportunity and would love to know if there are any updates on the status of my application. I am fully available for an interview at your earliest convenience.
+
+Thank you for your time and consideration.
+
+Best regards,
+Douglas Lobo
++351 967 704 277
+linkedin.com/in/douglascnlobo/</div>
+    </div>
+
+    <script>
+        function showTab(id, lang) {
+            document.getElementById('email-pt-' + id).style.display = lang === 'pt' ? 'block' : 'none';
+            document.getElementById('email-en-' + id).style.display = lang === 'en' ? 'block' : 'none';
+            document.getElementById('tab-pt-' + id).className = lang === 'pt' ? 'tab active' : 'tab';
+            document.getElementById('tab-en-' + id).className = lang === 'en' ? 'tab active' : 'tab';
+        }
+    </script>
+</section>
+</body>
+</html>

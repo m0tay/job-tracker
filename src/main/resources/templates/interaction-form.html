@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title>Log Interaction</title></head>
+<body>
+<section class="main">
+    <h1><i class="fa-solid fa-pen-to-square"></i> Log Interaction</h1>
+    <p class="subtitle-text">Record every contact (email, interview, follow-up, response) made to a company or a specific recruiter.</p>
+
+    <div class="card">
+        <form action="/interactions/new" method="post">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Target: Job Application</label>
+                    <select name="applicationId">
+                        <option value="">— None —</option>
+                        <option th:each="app : ${applications}"
+                                th:value="${app.id}"
+                                th:text="${app.company} + ' — ' + ${app.position}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Target: Recruiter</label>
+                    <select name="recruiterId">
+                        <option value="">— None —</option>
+                        <option th:each="rec : ${recruiters}"
+                                th:value="${rec.id}"
+                                th:text="${rec.name} + ' — ' + ${rec.company}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Interaction Type</label>
+                    <select name="type">
+                        <option value="Candidatura">Candidatura</option>
+                        <option value="Follow-up">Follow-up</option>
+                        <option value="Resposta Recebida">Resposta Recebida</option>
+                        <option value="Entrevista">Entrevista</option>
+                        <option value="Desafio Técnico">Desafio Técnico</option>
+                        <option value="Proposta/Oferta">Proposta/Oferta</option>
+                        <option value="Rejeição">Rejeição</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" name="date" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea name="notes" rows="3" placeholder="What happened exactly?"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label style="display:inline;">
+                    <input type="checkbox" name="autoUpdate" value="true" checked>
+                    Auto-update parent status (e.g. Rejeição → Rejeitado)
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Log Interaction</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>

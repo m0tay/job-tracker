@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title>CRM Recruiters</title></head>
+<body>
+<section class="main">
+    <h1><i class="fa-solid fa-users"></i> CRM Recruiters</h1>
+    <p class="subtitle-text">Track every recruiter you contact on LinkedIn. Monitor who responded, who ghosted, and where to push.</p>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="metrics">
+        <div class="metric">
+            <div class="value" th:text="${totalRecruiters}">0</div>
+            <div class="label">Total Contacted</div>
+        </div>
+        <div class="metric good">
+            <div class="value" th:text="${positiveCount}">0</div>
+            <div class="label"><i class="fa-solid fa-check"></i> Positive</div>
+        </div>
+        <div class="metric warn">
+            <div class="value" th:text="${negativeCount}">0</div>
+            <div class="label"><i class="fa-solid fa-xmark"></i> Negative</div>
+        </div>
+        <div class="metric">
+            <div class="value" th:text="${ghostCount}">0</div>
+            <div class="label"><i class="fa-solid fa-ghost"></i> Ghost</div>
+        </div>
+        <div class="metric">
+            <div class="value" th:text="${pendingCount}">0</div>
+            <div class="label"><i class="fa-solid fa-hourglass-half"></i> Pending</div>
+        </div>
+    </div>
+
+    <div th:if="${pendingCount > 0}" class="alert alert-warning">
+        <i class="fa-solid fa-hourglass-half"></i> You have <strong th:text="${pendingCount}"></strong> recruiters still pending response.
+    </div>
+
+    <div style="margin-bottom:15px;">
+        <a href="/recruiters/new" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Recruiter</a>
+    </div>
+
+    <div class="card">
+        <h2>Contacted Recruiters</h2>
+        <form method="get" action="/recruiters" style="margin-bottom:15px;">
+            <div class="form-row">
+                <div class="form-group" style="max-width:200px;">
+                    <label>Filter:</label>
+                    <select name="responseFilter" onchange="this.form.submit()">
+                        <option value="All">All</option>
+                        <option value="Pendente" th:selected="${responseFilter == 'Pendente'}">Pendente</option>
+                        <option value="Positivo" th:selected="${responseFilter == 'Positivo'}">Positivo</option>
+                        <option value="Negativo" th:selected="${responseFilter == 'Negativo'}">Negativo</option>
+                        <option value="Ghost" th:selected="${responseFilter == 'Ghost'}">Ghost</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+
+        <div th:if="${#lists.isEmpty(rows)}" class="alert alert-warning">
+            No recruiters registered yet. <a href="/recruiters/new">Add one →</a>
+        </div>
+
+        <table th:unless="${#lists.isEmpty(rows)}">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th>Stack</th>
+                    <th>Response</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="row : ${rows}">
+                    <td>
+                        <strong th:text="${row['recruiter'].name}"></strong>
+                        <a th:if="${row['recruiter'].linkedinUrl != null and !row['recruiter'].linkedinUrl.isEmpty()}"
+                           th:href="${row['recruiter'].linkedinUrl}" target="_blank" style="font-size:0.8rem;"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </td>
+                    <td th:text="${row['recruiter'].company}"></td>
+                    <td th:text="${row['recruiter'].role}"></td>
+                    <td th:text="${row['recruiter'].stack}"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${row['recruiter'].response == 'Positivo'} ? 'badge-positive' : (${row['recruiter'].response == 'Negativo'} ? 'badge-negative' : (${row['recruiter'].response == 'Ghost'} ? 'badge-ghost' : 'badge-pending'))"
+                              th:text="${row['recruiter'].response}"></span>
+                    </td>
+                    <td th:text="${row['dateFmt']}"></td>
+                    <td th:text="${row['recruiter'].notes}"></td>
+                    <td>
+                        <a th:href="@{'/recruiters/' + ${row['recruiter'].id} + '/edit'}" class="btn btn-primary" style="padding:4px 8px; font-size:0.75rem;">Edit</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="divider">
+
+    <div class="card">
+        <h2><i class="fa-solid fa-comment-dots"></i> LinkedIn Message Template (&lt; 300 chars)</h2>
+        <p class="subtitle-text">Copy and personalize this base message before sending to each recruiter.</p>
+
+        <div class="tabs">
+            <span class="tab active" id="msg-tab-pt" onclick="showMsgTab('pt')">PT — Português</span>
+            <span class="tab" id="msg-tab-en" onclick="showMsgTab('en')">EN — English</span>
+        </div>
+
+        <div id="msg-pt" class="code-block">Olá [NOME]! Sou de Aveiro, ex-Altice Labs (experiência em OSS/backend). Atualmente desenvolvo arquiteturas de microsserviços Java com RabbitMQ, PostgreSQL, MongoDB e Docker. Gostaria de conectar e explorar oportunidades na [EMPRESA]!</div>
+        <div id="msg-en" class="code-block" style="display:none;">Hi [NAME]! I'm based in Aveiro with backend experience at Altice Labs (OSS). Currently building Java microservices with RabbitMQ, PostgreSQL, MongoDB and Docker. Would love to connect and explore opportunities at [COMPANY]!</div>
+
+        <p style="margin-top:10px; color:#888; font-size:0.85rem;">
+            <i class="fa-solid fa-lightbulb"></i> Replace [NOME]/[EMPRESA] with the actual name. Mention their stack if you know it. Max 300 characters for LinkedIn connection notes.
+        </p>
+    </div>
+
+    <script>
+        function showMsgTab(lang) {
+            document.getElementById('msg-pt').style.display = lang === 'pt' ? 'block' : 'none';
+            document.getElementById('msg-en').style.display = lang === 'en' ? 'block' : 'none';
+            document.getElementById('msg-tab-pt').className = lang === 'pt' ? 'tab active' : 'tab';
+            document.getElementById('msg-tab-en').className = lang === 'en' ? 'tab active' : 'tab';
+        }
+    </script>
+</section>
+</body>
+</html>

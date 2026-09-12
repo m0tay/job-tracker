@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title>Add Recruiter</title></head>
+<body>
+<section class="main">
+    <h1><i class="fa-solid fa-plus"></i> Add Recruiter</h1>
+    <p class="subtitle-text">Register a new recruiter contact.</p>
+
+    <div class="card">
+        <form action="/recruiters/new" method="post">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Recruiter Name *</label>
+                    <input type="text" name="name" required placeholder="e.g. João Silva">
+                </div>
+                <div class="form-group">
+                    <label>Company *</label>
+                    <input type="text" name="company" required placeholder="e.g. Dellent">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" name="role" placeholder="e.g. IT Talent Recruiter">
+                </div>
+                <div class="form-group">
+                    <label>LinkedIn URL</label>
+                    <input type="url" name="linkedinUrl" placeholder="https://linkedin.com/in/...">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Stack / Company Focus</label>
+                    <input type="text" name="stack" placeholder="e.g. Java, Spring Boot, Angular">
+                </div>
+                <div class="form-group">
+                    <label>Contact Date</label>
+                    <input type="date" name="contactDate" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Link to Existing Application (Optional)</label>
+                <select name="applicationId">
+                    <option value="">— None (Lead Only) —</option>
+                    <option th:each="app : ${applications}"
+                            th:value="${app.id}"
+                            th:text="${app.company} + ' — ' + ${app.position}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Message Sent</label>
+                <textarea name="sentMessage" rows="3" placeholder="Paste the message you sent (for future reference)..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea name="notes" rows="2" placeholder="e.g. Backend role in Aveiro, saw on ITJobs..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Recruiter</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>

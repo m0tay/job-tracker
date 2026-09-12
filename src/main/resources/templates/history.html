@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title>Full History</title></head>
+<body>
+<section class="main">
+    <h1><i class="fa-solid fa-scroll"></i> Interaction History</h1>
+    <p class="subtitle-text">Chronological record of all contacts made with each company and recruiter.</p>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="metrics">
+        <div class="metric">
+            <div class="value" th:text="${totalInteractions}">0</div>
+            <div class="label">Total Interactions</div>
+        </div>
+        <div class="metric">
+            <div class="value" th:text="${companiesContacted}">0</div>
+            <div class="label">Companies Contacted</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <form method="get" action="/history" style="margin-bottom:15px;">
+            <div class="form-row">
+                <div class="form-group" style="max-width:300px;">
+                    <label>Filter by Company:</label>
+                    <select name="companyId" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        <option th:each="app : ${applications}"
+                                th:value="${app.id}"
+                                th:text="${app.company}"
+                                th:selected="${app.id == companyId}"></option>
+                    </select>
+                </div>
+            </div>
+        </form>
+
+        <div th:if="${#lists.isEmpty(timeline)}" class="alert alert-warning">
+            No interactions recorded yet. Use <a href="/interactions/new"><i class="fa-solid fa-pen-to-square"></i> Log Interaction</a> to start tracking!
+        </div>
+
+        <div th:unless="${#lists.isEmpty(timeline)}">
+            <div th:each="entry : ${timeline}" class="timeline-item">
+                <span class="timeline-date" th:text="${entry['date']}"></span> ·
+                <span class="timeline-type" th:text="${entry['interaction'].type}"></span> ·
+                <span class="timeline-target" th:text="${entry['target']}"></span>
+                <div th:if="${entry['interaction'].notes != null and !entry['interaction'].notes.isEmpty()}"
+                     class="timeline-notes">
+                    → <span th:text="${entry['interaction'].notes}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

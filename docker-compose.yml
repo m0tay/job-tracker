@@ -1,0 +1,9 @@
+services:
+  tracker-app:
+    image: ${IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+    container_name: job-tracker
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    env_file:
+      - .env
+    restart: unless-stopped
